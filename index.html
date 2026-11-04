@@ -248,15 +248,23 @@ function paint(c,W,H,go){
   });
   return y+P-16;
 }
+function showImg(u){
+  const o=document.createElement("div");
+  o.style.cssText="position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.75);overflow:auto;padding:calc(20px + env(safe-area-inset-top,0px)) 16px 24px;text-align:center;font:15px system-ui,sans-serif;color:#fff";
+  const p=document.createElement("p");p.textContent="Press and hold the image to save it (or right-click on a computer).";
+  const im=document.createElement("img");im.src=u;im.alt="Your spiritual gift results";im.style.cssText="max-width:100%;border-radius:12px;background:#faf8f4";
+  const b=document.createElement("button");b.className="btn p";b.textContent="Close";b.style.marginTop="14px";b.onclick=()=>o.remove();
+  o.append(p,im,document.createElement("br"),b);document.body.appendChild(o);
+}
 async function exportImage(){
   let dl=null;
   try{dl=window.claude?await window.claude.use("downloads"):null}catch(e){}
-  if(!dl){alert("Saving an image isn’t available in this view.");return}
   const W=800,k=2;
   const cv=document.createElement("canvas");const c=cv.getContext("2d");
   const H=paint(c,W,0,false);
   cv.width=W*k;cv.height=H*k;c.scale(k,k);
   paint(c,W,H,true);
+  if(!dl){showImg(cv.toDataURL("image/png"));return}
   const blob=await new Promise(r=>cv.toBlob(r,"image/png"));
   try{await dl.save({filename:"spiritual-gift-results.png",data:blob})}catch(e){if(!e||e.code!=="declined")alert("Couldn’t save the image.")}
 }
