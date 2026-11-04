@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Spiritual Gift Assessment</title>
+<style>
+:root{--bg:#faf8f4;--card:#fff;--text:#1f2a24;--muted:#66706a;--accent:#2f6b4f;--accent-t:#fff;--line:#e2ded5;--soft:#e8f0eb;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161b18;--card:#1f2622;--text:#eef2ee;--muted:#9aa6a0;--accent:#6fbf94;--accent-t:#0f1a14;--line:#33403a;--soft:#26332c;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161b18;--card:#1f2622;--text:#eef2ee;--muted:#9aa6a0;--accent:#6fbf94;--accent-t:#0f1a14;--line:#33403a;--soft:#26332c;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--text);font:17px/1.5 Georgia,'Times New Roman',serif}
+.wrap{max-width:640px;margin:0 auto;padding:20px 18px 40px}
+h1{font-size:26px;margin:8px 0 4px}
+.sub{color:var(--muted);font-family:system-ui,sans-serif;font-size:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 20px;margin-top:18px}
+.bar{height:8px;background:var(--line);border-radius:8px;overflow:hidden;margin-top:14px}
+.bar>i{display:block;height:100%;background:var(--accent);width:0;transition:width .25s}
+.meta{display:flex;justify-content:space-between;font:13px system-ui,sans-serif;color:var(--muted);margin-top:8px}
+.q{font-size:21px;line-height:1.4;margin:6px 0 20px;min-height:90px}
+.opts{display:grid;gap:10px}
+.opt{font:600 16px system-ui,sans-serif;text-align:left;padding:14px 16px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);color:var(--text);cursor:pointer;display:flex;gap:12px;align-items:center}
+.opt b{display:inline-flex;width:28px;height:28px;border-radius:50%;background:var(--soft);align-items:center;justify-content:center;font-size:14px}
+.opt.sel{border-color:var(--accent);background:var(--soft)}
+.opt.sel b{background:var(--accent);color:var(--accent-t)}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:20px}
+.btn{font:600 15px system-ui,sans-serif;padding:12px 18px;border-radius:12px;border:1.5px solid var(--line);background:transparent;color:var(--text);cursor:pointer}
+.btn.p{background:var(--accent);color:var(--accent-t);border-color:var(--accent)}
+.btn:disabled{opacity:.4;cursor:default}
+.nav.actions{flex-direction:column;align-items:stretch}
+.nav.actions .btn{width:100%;min-height:48px;text-align:center}
+@media (min-width:560px){.nav.actions{flex-direction:row;flex-wrap:wrap}.nav.actions .btn{width:auto;flex:1 1 0}}
+.hint{font:13px system-ui,sans-serif;color:var(--muted);margin-top:14px;text-align:center}
+.row{margin:14px 0}
+.row .top{display:flex;justify-content:space-between;font:600 15px system-ui,sans-serif}
+.row .tr{height:10px;background:var(--line);border-radius:6px;margin-top:6px;overflow:hidden}
+.row .tr i{display:block;height:100%;background:var(--accent);border-radius:6px;opacity:.55}
+.row.top3 .tr i{opacity:1}
+.row p{font-size:14px;color:var(--muted);margin:6px 0 0}
+.gift{border-left:4px solid var(--accent);padding:4px 0 4px 14px;margin:16px 0}
+.gift h3{margin:0;font-size:19px}
+.gift p{margin:4px 0 0;font-size:15px}
+.hidden{display:none}
+.link{background:none;border:none;color:var(--muted);font:13px system-ui,sans-serif;text-decoration:underline;cursor:pointer;padding:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Spiritual Gift Assessment</h1>
+  <div class="sub">Greenhouse · 55 statements · answer with your first thought</div>
+
+  <div id="intro" class="card">
+    <p style="margin-top:0">For each statement, choose how often it’s true of you:</p>
+    <p style="font:15px system-ui,sans-serif;margin:0"><b>0</b> – not very often or never<br><b>1</b> – occasionally<br><b>2</b> – very regularly or always</p>
+    <p class="sub" style="margin-top:14px">Your progress saves automatically on this device, so you can close the page and pick up where you left off.</p>
+    <div class="nav" style="justify-content:flex-start"><button class="btn p" id="start">Begin</button></div>
+  </div>
+
+  <div id="quiz" class="card hidden">
+    <div class="meta"><span id="count"></span><span id="gift"></span></div>
+    <div class="bar"><i id="fill"></i></div>
+    <div class="q" id="qtext" style="margin-top:20px"></div>
+    <div class="opts" id="opts"></div>
+    <div class="nav">
+      <button class="btn" id="back">← Back</button>
+      <button class="btn p" id="next">Next →</button>
+    </div>
+    <div class="hint" id="hint">Tap an answer to continue</div>
+    <div style="text-align:center"><button class="link" id="jump">Jump to first unanswered</button></div>
+    <div class="nav" id="toResultsWrap"><button class="btn p" id="toResults" style="width:100%;min-height:48px">Return to results</button></div>
+  </div>
+
+  <div id="results" class="card hidden">
+    <h2 style="margin-top:0">Your results</h2>
+    <div id="top"></div>
+    <h3 style="margin-bottom:0">All scores</h3>
+    <div class="sub">Each gift has 5 statements, so the maximum is 10.</div>
+    <div id="all"></div>
+    <div class="nav actions">
+      <button class="btn p" id="export">Export as image</button>
+      <button class="btn" id="review">Review answers</button>
+      <button class="btn" id="reset">Start over</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const GIFTS=[
+["Exhortation","The divine enablement to proclaim God’s truth with power and clarity in a timely and culturally sensitive fashion for correction and repentance."],
+["Teaching","The divine enablement to understand, clearly explain, and apply the Word of God to the lives of listeners."],
+["Encouragement","The divine enablement to reassure, strengthen, and affirm those who are discouraged or wavering in their faith."],
+["Evangelism","The divine enablement to effectively communicate the message of Christ to unbelievers so they can respond in faith and discipleship."],
+["Hospitality","The divine enablement to care for people by providing for their needs with kindness and generosity."],
+["Leadership","The divine enablement to instill vision, to motivate and to direct people to accomplish the work of the ministry."],
+["Mercy","The divine enablement to minister cheerfully and appropriately to people who are suffering."],
+["Shepherding","The divine enablement to guide, care for, and nurture individuals or groups in the body as they grow in their faith."],
+["Administration","The divine enablement to understand what makes an organization function and the special ability to plan and execute procedures that increase the church’s organizational effectiveness."],
+["Giving","The divine enablement to contribute money and material resources to the work of the Lord with cheerfulness and liberality."],
+["Serving","The divine enablement to attach spiritual value to the accomplishment of practical and necessary tasks which support the body of Christ."]
+];
+const Q=[
+"I feel responsible to confront people with the truth.",
+"I listen with a careful ear to the teaching and presentations of others.",
+"I am more tolerant and sympathetic than distant and indifferent.",
+"I communicate the gospel with clarity, poise, and effectiveness.",
+"I am more concerned with making a person feel comfortable and safe than I am making an impression.",
+"I am able to motivate others toward a goal.",
+"I have compassion and am eager to help people who are hurting.",
+"I am compelled to lead by example and let my life serve as a model.",
+"I am careful, thorough, and skilled in details.",
+"I prefer to give without regard to my own finances.",
+"I am drawn to visible, tangible projects which require someone’s assistance.",
+"I am willing to experience personal repentance and to prompt repentance in others that God may be glorified.",
+"I enjoy researching truth and effectively communicating it to others at their level.",
+"I view trials as divine opportunities for growth.",
+"I strongly desire to share my faith with unbelievers.",
+"I am easy-going and feel comfortable around strangers.",
+"I influence others to be all God wants them to be.",
+"I readily gain the confidence of people in need.",
+"I am willing to spend much time caring for and nurturing a group of people.",
+"I am more composed and objective than nervous and subjective.",
+"I am a very conscientious person.",
+"I like short-term projects better than long-range responsibilities.",
+"I am more saddened than light-hearted about life and its problems.",
+"I am able to study, understand, and share truth from God’s Word.",
+"I have a strong desire to see people mature spiritually.",
+"I am committed to seeing new believers become growing members of the body of Christ.",
+"I feel fulfilled when entertaining people and have no thought of being repaid.",
+"I feel alone in making certain needed decisions.",
+"I am more moved to alleviate the causes of people’s hurts than to look for the potential benefits of their pain.",
+"I am tolerant and empathetic.",
+"I like to clarify goals and develop strategies to accomplish them.",
+"I like giving quietly—without public notice.",
+"My difficulty in saying “No” often results in over-involvement.",
+"I can speak so as to bring conviction and change in the lives of others.",
+"I enjoy studying in order to present truth in an organized manner.",
+"I enjoy strengthening the weak and reassuring the unstable.",
+"I look for opportunities to build relationships with non-churched people.",
+"I am attracted to and enjoy new people in the church.",
+"I have the vision and confidence needed to provide practical direction for groups within the church.",
+"I feel and accept the pain of others and have a desire to help them.",
+"I like to patiently and responsibly nurture others’ spiritual growth.",
+"I am able to identify and effectively use resources to accomplish tasks.",
+"I enjoy giving to others as a way to motivate others to give.",
+"I enjoy serving when it frees others to better accomplish their ministries.",
+"I boldly expose cultural trends that contradict Biblical truth.",
+"I am analytical and draw conclusions based on the data.",
+"I can spontaneously discern needs and encourage individuals.",
+"I look for and get excited about new ways to share the gospel.",
+"I am comfortable with all kinds of people and feel at ease with them.",
+"I am constantly aware that my life is an example.",
+"I get very upset when people are hurt, displaced, or rejected.",
+"I am willing to renounce personal interests for the sake of others.",
+"I am more concerned with accomplishing results for the Kingdom than with my personal needs.",
+"I am able to give liberally and joyfully regardless of what I have.",
+"In public settings, I am more inhibited than expressive."
+];
+const LABELS=["Not very often or never","Occasionally","Very regularly or always"];
+const KEY="spiritual-gift-quiz-v1";
+let st={a:Array(55).fill(null),i:0,started:false,done:false};
+const $=id=>document.getElementById(id);
+function load(){try{const r=localStorage.getItem(KEY);if(r){const s=JSON.parse(r);if(s&&Array.isArray(s.a)&&s.a.length===55)st=s}}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}}
+function show(v){["intro","quiz","results"].forEach(x=>$(x).classList.toggle("hidden",x!==v));window.scrollTo(0,0)}
+function answered(){return st.a.filter(x=>x!==null).length}
+function render(){
+  const i=st.i;
+  $("count").textContent="Question "+(i+1)+" of 55";
+  $("gift").textContent=answered()+" answered";
+  $("fill").style.width=(answered()/55*100)+"%";
+  $("qtext").textContent=Q[i];
+  const o=$("opts");o.innerHTML="";
+  [0,1,2].forEach(v=>{
+    const b=document.createElement("button");
+    b.className="opt"+(st.a[i]===v?" sel":"");
+    b.innerHTML="<b>"+v+"</b><span>"+LABELS[v]+"</span>";
+    b.onclick=()=>choose(v);
+    o.appendChild(b);
+  });
+  $("back").disabled=i===0;
+  const last=i===54;
+  $("next").textContent=last?"See results":"Next →";
+  $("next").disabled=st.a[i]===null;
+  $("hint").textContent=st.a[i]===null?"Tap an answer to continue":"";
+  $("toResultsWrap").classList.toggle("hidden",answered()<55);
+  $("jump").classList.toggle("hidden",answered()>=55);
+}
+function choose(v){
+  st.a[st.i]=v;save();render();
+  setTimeout(()=>{if(st.a[st.i]===v)advance()},220);
+}
+function advance(){
+  if(st.a[st.i]===null)return;
+  if(st.i<54){st.i++;save();render()}
+  else if(answered()===55){finish()}
+  else{st.i=st.a.indexOf(null);save();render()}
+}
+function scores(){
+  const s=Array(11).fill(0);
+  st.a.forEach((v,n)=>{s[n%11]+=v||0});
+  return s;
+}
+function finish(){
+  st.done=true;save();
+  const s=scores();
+  const order=s.map((v,i)=>[v,i]).sort((a,b)=>b[0]-a[0]||a[1]-b[1]);
+  const cutoff=order[2][0];
+  const topSet=new Set(order.filter(x=>x[0]>=cutoff&&x[0]>0).map(x=>x[1]));
+  const topList=order.filter(x=>topSet.has(x[1]));
+  $("top").innerHTML=topList.map(([v,i])=>
+    "<div class='gift'><h3>"+GIFTS[i][0]+" · "+v+"/10</h3><p>"+GIFTS[i][1]+"</p></div>").join("")
+    +(topList.length>3?"<div class='sub'>Showing more than three because of ties.</div>":"");
+  $("all").innerHTML=order.map(([v,i])=>
+    "<div class='row"+(topSet.has(i)?" top3":"")+"'><div class='top'><span>"+GIFTS[i][0]+"</span><span>"+v+"</span></div><div class='tr'><i style='width:"+(v*10)+"%'></i></div></div>").join("");
+  show("results");
+}
+function wrapText(c,t,maxW){const w=t.split(" ");const lines=[];let l="";w.forEach(x=>{const n=l?l+" "+x:x;if(c.measureText(n).width>maxW&&l){lines.push(l);l=x}else l=n});if(l)lines.push(l);return lines}
+function paint(c,W,H,go){
+  const P=40,iw=W-2*P;let y=P;
+  const s=scores();
+  const order=s.map((v,i)=>[v,i]).sort((a,b)=>b[0]-a[0]||a[1]-b[1]);
+  const cut=order[2][0];
+  const top=order.filter(x=>x[0]>=cut&&x[0]>0);
+  const topIds=new Set(top.map(x=>x[1]));
+  if(go){c.fillStyle="#faf8f4";c.fillRect(0,0,W,H)}
+  const T=(t,x,yy,f,col,al)=>{if(!go)return;c.font=f;c.fillStyle=col;c.textAlign=al||"left";c.fillText(t,x,yy)};
+  y+=26;T("Spiritual Gift Assessment",P,y,"700 28px Georgia,serif","#1f2a24");
+  y+=26;T("Your results",P,y,"16px system-ui,sans-serif","#66706a");
+  y+=22;
+  top.forEach(([v,i])=>{
+    c.font="16px Georgia,serif";
+    const lines=wrapText(c,GIFTS[i][1],iw-18);
+    const h=20+8+lines.length*22+4;
+    if(go){c.fillStyle="#2f6b4f";c.fillRect(P,y,4,h)}
+    T(GIFTS[i][0]+" · "+v+"/10",P+18,y+20,"700 20px Georgia,serif","#1f2a24");
+    lines.forEach((ln,k)=>T(ln,P+18,y+20+8+(k+1)*22-4,"16px Georgia,serif","#1f2a24"));
+    y+=h+16;
+  });
+  y+=10;T("All scores",P,y+20,"700 20px Georgia,serif","#1f2a24");
+  y+=20+22;T("Each gift has 5 statements, so the maximum is 10.",P,y,"13px system-ui,sans-serif","#66706a");
+  y+=16;
+  order.forEach(([v,i])=>{
+    T(GIFTS[i][0],P,y+18,"600 15px system-ui,sans-serif","#1f2a24");
+    T(String(v),P+iw,y+18,"600 15px system-ui,sans-serif","#1f2a24","right");
+    if(go){c.fillStyle="#e2ded5";c.fillRect(P,y+26,iw,10);c.fillStyle=topIds.has(i)?"#2f6b4f":"#9bb9aa";c.fillRect(P,y+26,iw*v/10,10)}
+    y+=46;
+  });
+  return y+P-16;
+}
+async function exportImage(){
+  let dl=null;
+  try{dl=window.claude?await window.claude.use("downloads"):null}catch(e){}
+  if(!dl){alert("Saving an image isn’t available in this view.");return}
+  const W=800,k=2;
+  const cv=document.createElement("canvas");const c=cv.getContext("2d");
+  const H=paint(c,W,0,false);
+  cv.width=W*k;cv.height=H*k;c.scale(k,k);
+  paint(c,W,H,true);
+  const blob=await new Promise(r=>cv.toBlob(r,"image/png"));
+  try{await dl.save({filename:"spiritual-gift-results.png",data:blob})}catch(e){if(!e||e.code!=="declined")alert("Couldn’t save the image.")}
+}
+$("export").onclick=exportImage;
+$("start").onclick=()=>{st.started=true;save();show("quiz");render()};
+$("back").onclick=()=>{if(st.i>0){st.i--;save();render()}};
+$("next").onclick=advance;
+$("toResults").onclick=()=>{if(answered()===55)finish()};
+$("jump").onclick=()=>{const k=st.a.indexOf(null);if(k>=0){st.i=k;save();render()}};
+$("review").onclick=()=>{st.done=false;st.i=0;save();show("quiz");render()};
+$("reset").onclick=()=>{if(confirm("Erase all answers and start over?")){st={a:Array(55).fill(null),i:0,started:false,done:false};save();show("intro")}};
+load();
+if(st.done&&answered()===55){finish()}
+else if(st.started||answered()>0){
+  $("start").textContent="Resume";
+  show("quiz");render();
+}
+else show("intro");
+</script>
+</body>
+</html>
